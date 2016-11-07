@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanDNS", "LanDNS\LanDNS.csproj", "{A046D47C-E397-458B-954E-4D77F65B2766}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNSServer", "DNSServer\DNSServer.csproj", "{80B01217-E54D-4E01-AB50-F40ECA290497}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNSClient", "DNSClient\DNSClient.csproj", "{A7B39493-4BFF-456D-A61B-4407EA35F3D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{A046D47C-E397-458B-954E-4D77F65B2766}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A046D47C-E397-458B-954E-4D77F65B2766}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A046D47C-E397-458B-954E-4D77F65B2766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80B01217-E54D-4E01-AB50-F40ECA290497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80B01217-E54D-4E01-AB50-F40ECA290497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80B01217-E54D-4E01-AB50-F40ECA290497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80B01217-E54D-4E01-AB50-F40ECA290497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B39493-4BFF-456D-A61B-4407EA35F3D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B39493-4BFF-456D-A61B-4407EA35F3D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B39493-4BFF-456D-A61B-4407EA35F3D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B39493-4BFF-456D-A61B-4407EA35F3D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
