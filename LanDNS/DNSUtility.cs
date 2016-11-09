@@ -10,7 +10,6 @@ namespace LanDNS
 {
     internal static class DNSUtility
     {
-
         internal static readonly int DNS_PORT = 5053;
 
         internal static int GetLanDNS(out MessageReplyDNSInfo dnsReply)
