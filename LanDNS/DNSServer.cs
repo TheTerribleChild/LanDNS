@@ -31,6 +31,13 @@ namespace LanDNS
 
         public void Start()
         {
+            MessageReplyDNSInfo dnsInfo;
+            int dnsCount = DNSUtility.GetLanDNS(out dnsInfo);
+            if (dnsCount > 0)
+            {
+                Console.WriteLine("One or more DNS already exist in the network");
+                return;
+            }
             dnsListener.Listen = true;
         }
 
@@ -48,14 +55,17 @@ namespace LanDNS
                     case MessageType.SYN:
                         message = Utility.SerializeUtility.DeserializeJsonString<MessageSYN>(args.Message);
                         break;
-                    case MessageType.SYNACK:
-                        message = Utility.SerializeUtility.DeserializeJsonString<MessageSYNACK>(args.Message);
+                    case MessageType.ACK:
+                        message = Utility.SerializeUtility.DeserializeJsonString<MessageACK>(args.Message);
                         break;
                     case MessageType.Refresh:
                         message = Utility.SerializeUtility.DeserializeJsonString<MessageRefresh>(args.Message);
                         break;
                     case MessageType.Request:
                         message = Utility.SerializeUtility.DeserializeJsonString<MessageRequest>(args.Message);
+                        break;
+                    case MessageType.GetDNS:
+                        message = Utility.SerializeUtility.DeserializeJsonString<MessageGetDNS>(args.Message);
                         break;
                     default:
                         break;
@@ -77,7 +87,7 @@ namespace LanDNS
 
         }
 
-        private void SynAckReceived(MessageSYN message, IPEndPoint remoteEndPoint)
+        private void AckReceived(MessageSYN message, IPEndPoint remoteEndPoint)
         {
 
         }
@@ -88,6 +98,11 @@ namespace LanDNS
         }
 
         private void RequestReceived(MessageSYN message, IPEndPoint remoteEndPoint)
+        {
+
+        }
+
+        private void GetDNSReceived(MessageGetDNS message, IPEndPoint remoteEndPoint)
         {
 
         }
