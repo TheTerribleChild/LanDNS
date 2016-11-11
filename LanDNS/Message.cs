@@ -12,8 +12,6 @@ namespace LanDNS
 
     internal class Message
     {
-        
-
         public MessageType Type { get; private set; }
 
         public Message(MessageType type)
@@ -24,7 +22,6 @@ namespace LanDNS
 
     internal class MessageSYN : Message
     {
-
         public uint ClientSequence { get; private set; }
 
         public MessageSYN(uint clientSequence) : base(MessageType.SYN)
@@ -60,10 +57,12 @@ namespace LanDNS
     internal class MessageAccept : Message
     {
         public uint SequenceSum { get; private set; }
+        public int SessionDuration { get; private set; }
         
-        public MessageAccept(uint sequenceSum) : base(MessageType.Accept)
+        public MessageAccept(uint sequenceSum, int sessionDuration) : base(MessageType.Accept)
         {
             this.SequenceSum = sequenceSum;
+            this.SessionDuration = sessionDuration;
         }
     }
 
@@ -118,13 +117,13 @@ namespace LanDNS
 
     internal class MessageReplyDNSInfo : Message
     {
-        public IPEndPoint DNSReceiverEP { get; private set; }
-        public IPEndPoint DNSReplyEP { get; private set; }
+        public IPEndPoint DNSListenerEP { get; private set; }
+        public IPEndPoint DNSResponderEP { get; private set; }
 
-        public MessageReplyDNSInfo(IPEndPoint dnsReceiverEP, IPEndPoint dnsReplyEP) : base(MessageType.ReplyDNSInfo)
+        public MessageReplyDNSInfo(IPEndPoint dnsListenerEP, IPEndPoint dnsResponderEP) : base(MessageType.ReplyDNSInfo)
         {
-            this.DNSReceiverEP = dnsReceiverEP;
-            this.DNSReplyEP = dnsReplyEP;
+            this.DNSListenerEP = dnsListenerEP;
+            this.DNSResponderEP = dnsResponderEP;
         }
     }
 }

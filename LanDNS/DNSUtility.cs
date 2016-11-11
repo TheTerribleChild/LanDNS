@@ -15,7 +15,7 @@ namespace LanDNS
         internal static int GetLanDNS(out MessageReplyDNSInfo dnsReply)
         {
             UdpClient client = new UdpClient();
-            client.Client.ReceiveTimeout = 5000;
+            client.Client.ReceiveTimeout = 2000;
 
             MessageGetDNS getDNSMessage = new MessageGetDNS();
             byte[] data = Encoding.UTF8.GetBytes(Utility.SerializeUtility.SerializeToJsonString(getDNSMessage));
@@ -24,20 +24,34 @@ namespace LanDNS
             IPEndPoint dnsEP = new IPEndPoint(IPAddress.Any, 0);
 
             int dnsCount = 0;
+            dnsReply = null;
 
             client.Send(data, data.Length, broadcastEP);
 
             while (true)
             {
-                byte[] incomingData = client.Receive(ref dnsEP);
+                
                 try
                 {
-                    dnsReply = Utility.SerializeUtility.DeserializeJsonString<MessageReplyDNSInfo>(Encoding.UTF8.GetString(incomingData));
-                    dnsCount++;
+                    byte[] incomingData = client.Receive(ref dnsEP);
+                    Message replyMessage = Utility.SerializeUtility.DeserializeJsonString<Message>(Encoding.UTF8.GetString(incomingData));
+
+                    if (replyMessage.Type == MessageType.ReplyDNSInfo)
+                    {
+                        dnsReply = Utility.SerializeUtility.DeserializeJsonString<MessageReplyDNSInfo>(Encoding.UTF8.GetString(incomingData));
+                        dnsCount++;
+                    }
+                        
                     if (dnsCount > 1)
                         break;
                 }
-                catch (Exception) { }
+                catch (System.Net.Sockets.SocketException e) {
+                    break;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
 
             client.Close();

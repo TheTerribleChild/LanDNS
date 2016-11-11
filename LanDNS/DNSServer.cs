@@ -16,21 +16,22 @@ namespace LanDNS
 
     public class DNSServer
     {
-        private static readonly IPEndPoint DNS_ENDPOINT = new IPEndPoint(IPAddress.Any, 5053);
+        private IPEndPoint DNS_LISTENER_EP;
+        private IPEndPoint DNS_RESPONDER_EP;
 
         private Utility.WebUtility.UdpConnector dnsListener;
         private Utility.WebUtility.UdpConnector dnsResponder;
 
         public DNSServer()
         {
-            this.dnsListener = new Utility.WebUtility.UdpConnector(DNS_ENDPOINT);
-            this.dnsListener.MessageReceived += this.ParseDNSMessage;
-
-            this.dnsResponder = new Utility.WebUtility.UdpConnector();
+            
         }
 
         public void Start()
         {
+            
+            Console.WriteLine("Checking for other DNS in network....");
+
             MessageReplyDNSInfo dnsInfo;
             int dnsCount = DNSUtility.GetLanDNS(out dnsInfo);
             if (dnsCount > 0)
@@ -38,12 +39,23 @@ namespace LanDNS
                 Console.WriteLine("One or more DNS already exist in the network");
                 return;
             }
+
+            Console.WriteLine("No DNS detected. Starting DNS");
+
+            IPAddress hostIP = Utility.WebUtility.GetLocalIPAddress();
+            DNS_LISTENER_EP = new IPEndPoint(hostIP, 5053);
+            DNS_RESPONDER_EP = new IPEndPoint(hostIP, Utility.WebUtility.GetNextAvailableUDPPortNumber());
+
+            dnsListener = new Utility.WebUtility.UdpConnector(DNS_LISTENER_EP);
+            dnsListener.MessageReceived += this.ParseDNSMessage;
+
+            dnsResponder = new Utility.WebUtility.UdpConnector(DNS_RESPONDER_EP);
+
             dnsListener.Listen = true;
         }
 
         public void ParseDNSMessage(object sender, Utility.WebUtility.MessageReceivedEventArgs args)
         {
-            Console.WriteLine("Thread ID" + Thread.CurrentThread.ManagedThreadId);
             try
             {
                 MessageType type = Utility.SerializeUtility.DeserializeJsonString<Message>(args.Message).Type;
@@ -65,19 +77,14 @@ namespace LanDNS
                         message = Utility.SerializeUtility.DeserializeJsonString<MessageRequest>(args.Message);
                         break;
                     case MessageType.GetDNS:
-                        message = Utility.SerializeUtility.DeserializeJsonString<MessageGetDNS>(args.Message);
+                        GetDNSReceived(Utility.SerializeUtility.DeserializeJsonString<MessageGetDNS>(args.Message), args.RemoteEndpoint);
                         break;
                     default:
                         break;
                 }
-                Message returnMessage = new MessageReject(0, "Hello");
-                dnsListener.SendMessage(Utility.SerializeUtility.SerializeToJsonString(returnMessage), args.RemoteEndpoint);
-
             }
             catch(Exception e)
             {
-                Message message = new MessageReject(0, "unknown message");
-                dnsListener.SendMessage(Utility.SerializeUtility.SerializeToJsonString(message), args.RemoteEndpoint);
                 return;
             }
         }
@@ -104,7 +111,7 @@ namespace LanDNS
 
         private void GetDNSReceived(MessageGetDNS message, IPEndPoint remoteEndPoint)
         {
-
+            dnsResponder.SendMessage(Utility.SerializeUtility.SerializeToJsonString(new MessageReplyDNSInfo(DNS_LISTENER_EP, DNS_RESPONDER_EP)), remoteEndPoint);
         }
     }
 }
