@@ -22,9 +22,52 @@ namespace LanDNS
         private Utility.WebUtility.UdpConnector dnsListener;
         private Utility.WebUtility.UdpConnector dnsResponder;
 
+        public static readonly int DNS_PORT = 5053;
+
+        private Dictionary<uint, DNSSessionWrapper> sessionDictionary;
+
+        private class DNSSessionWrapper : DNSSession
+        {
+
+            private Timer expirationTimer;
+
+            public DNSSessionWrapper(IPEndPoint dnsReceiverEP, IPEndPoint dnsResponderEP, IPEndPoint remoteEP, IPEndPoint serviceEP, uint sessionKey) : base()
+            {
+                this.DNSReceiverEP = dnsReceiverEP;
+                this.DNSResponderEP = dnsResponderEP;
+                this.RemoteEP = remoteEP;
+                this.ServiceEP = serviceEP;
+                this.SessionKey = sessionKey;
+                this.SessionExpirationTime = DateTime.MinValue;
+                this.SessionRefreshTime = DateTime.MinValue;
+            }
+
+            public void SetSessionDuration(int ms, DNSServer dnsServer)
+            {
+                this.SessionExpirationTime = DateTime.Now.AddMilliseconds(ms);
+                this.SessionRefreshTime = DateTime.Now.AddMilliseconds(ms * 0.75);
+                //expirationTimer = new Timer()
+            }
+
+            public DNSSession GetSession()
+            {
+                return (DNSSession)this;
+            }
+
+            public void RefreshSession()
+            {
+
+            }
+
+            public void SetActive()
+            {
+
+            }
+        }
+
         public DNSServer()
         {
-            
+            this.sessionDictionary = new Dictionary<uint, DNSSessionWrapper>();
         }
 
         public void Start()
@@ -43,23 +86,22 @@ namespace LanDNS
             Console.WriteLine("No DNS detected. Starting DNS");
 
             IPAddress hostIP = Utility.WebUtility.GetLocalIPAddress();
-            DNS_LISTENER_EP = new IPEndPoint(hostIP, 5053);
+            DNS_LISTENER_EP = new IPEndPoint(hostIP, DNS_PORT);
             DNS_RESPONDER_EP = new IPEndPoint(hostIP, Utility.WebUtility.GetNextAvailableUDPPortNumber());
-
-            dnsListener = new Utility.WebUtility.UdpConnector(DNS_LISTENER_EP);
-            dnsListener.MessageReceived += this.ParseDNSMessage;
 
             dnsResponder = new Utility.WebUtility.UdpConnector(DNS_RESPONDER_EP);
 
+            dnsListener = new Utility.WebUtility.UdpConnector(DNS_LISTENER_EP);
+            dnsListener.MessageReceived += this.ParseIncomeMessage;
             dnsListener.Listen = true;
         }
 
-        public void ParseDNSMessage(object sender, Utility.WebUtility.MessageReceivedEventArgs args)
+        private void ParseIncomeMessage(object sender, Utility.WebUtility.MessageReceivedEventArgs args)
         {
             try
             {
                 MessageType type = Utility.SerializeUtility.DeserializeJsonString<Message>(args.Message).Type;
-                Console.WriteLine(type + " " + args.RemoteEndpoint + " " + args.LocalEndpoint);
+                //Console.WriteLine(type + " " + args.RemoteEndpoint + " " + args.LocalEndpoint);
                 Message message;
 
                 switch (type)
@@ -112,6 +154,30 @@ namespace LanDNS
         private void GetDNSReceived(MessageGetDNS message, IPEndPoint remoteEndPoint)
         {
             dnsResponder.SendMessage(Utility.SerializeUtility.SerializeToJsonString(new MessageReplyDNSInfo(DNS_LISTENER_EP, DNS_RESPONDER_EP)), remoteEndPoint);
+        }
+
+        private uint GenerateSessionKey(uint clientInputKey)
+        {
+            uint potentialKey;
+
+            do
+            {
+                potentialKey = clientInputKey + (uint)new Random().Next();
+            } while (sessionDictionary.ContainsKey(potentialKey));
+
+            return potentialKey;
+        }
+
+        
+
+        private void AddSession()
+        {
+
+        }
+
+        private void RemoveSession()
+        {
+
         }
     }
 }

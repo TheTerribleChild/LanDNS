@@ -20,6 +20,7 @@ namespace LanDNS
         }
     }
 
+    //First step of 3 way handshake with DNS Server.
     internal class MessageSYN : Message
     {
         public uint ClientSequence { get; private set; }
@@ -30,6 +31,7 @@ namespace LanDNS
         }
     }
 
+    //Third step of 3 way handshake with DNS Server.
     internal class MessageACK : Message
     {
         public uint ServerSequence { get; private set; }
@@ -43,6 +45,7 @@ namespace LanDNS
         }
     }
 
+    //Second step of 3 way handshake with DNS Server.
     internal class MessageSYNACK : Message
     {
         public uint SequenceSum { get; private set; }
@@ -54,18 +57,20 @@ namespace LanDNS
         }
     }
 
+    //Accept client's request to host IP for service.
     internal class MessageAccept : Message
     {
         public uint SequenceSum { get; private set; }
-        public int SessionDuration { get; private set; }
+        public DNSSession Session { get; private set; }
         
-        public MessageAccept(uint sequenceSum, int sessionDuration) : base(MessageType.Accept)
+        public MessageAccept(uint sequenceSum, DNSSession session) : base(MessageType.Accept)
         {
             this.SequenceSum = sequenceSum;
-            this.SessionDuration = sessionDuration;
+            this.Session = session;
         }
     }
 
+    //Reject the client's request to host IP for service.
     internal class MessageReject : Message
     {
         public uint SequenceSum { get; private set; }
@@ -78,6 +83,7 @@ namespace LanDNS
         }
     }
 
+    //Request to refresh service.
     internal class MessageRefresh : Message
     {
         public uint SequenceSum { get; private set; }
@@ -88,16 +94,20 @@ namespace LanDNS
         }
     }
 
+    //Request DNS for IP for service.
     internal class MessageRequest : Message
     {
         public string ServiceName { get; private set; }
+        public uint SecretKey { get; private set; }
 
-        public MessageRequest(string serviceName): base(MessageType.Request)
+        public MessageRequest(string serviceName, uint secretKey = 0): base(MessageType.Request)
         {
             this.ServiceName = serviceName;
+            this.SecretKey = secretKey;
         }
     }
 
+    //Return a client's request for service.
     internal class MessageReturnRequest : Message
     {
         public IPEndPoint ServiceEndpoint { get; private set; }
@@ -108,6 +118,7 @@ namespace LanDNS
         }
     }
 
+    //Broadcast message to request for DNS Info.
     internal class MessageGetDNS : Message
     {
         public MessageGetDNS() : base(MessageType.GetDNS)
@@ -115,6 +126,7 @@ namespace LanDNS
         }
     }
 
+    //Reply to MessageGetDNS with DNS info.
     internal class MessageReplyDNSInfo : Message
     {
         public IPEndPoint DNSListenerEP { get; private set; }

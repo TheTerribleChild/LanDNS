@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="DNSClient.cs" />
     <Compile Include="DNSServer.cs" />
+    <Compile Include="DNSSession.cs" />
     <Compile Include="DNSUtility.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
