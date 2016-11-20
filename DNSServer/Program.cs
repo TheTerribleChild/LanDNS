@@ -10,8 +10,7 @@ namespace DNSServer
     {
         static void Main(string[] args)
         {
-            LanDNS.DNSServer server = new LanDNS.DNSServer();
-            server.Start();
+            LanDNS.DNSServer.Instance.Start();
         }
     }
 }

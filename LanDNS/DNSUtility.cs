@@ -45,7 +45,7 @@ namespace LanDNS
                     if (dnsCount > 1)
                         break;
                 }
-                catch (System.Net.Sockets.SocketException e) {
+                catch (System.Net.Sockets.SocketException) {
                     break;
                 }
                 catch(Exception e)

@@ -45,10 +45,11 @@
   <ItemGroup>
     <Compile Include="DNSClient.cs" />
     <Compile Include="DNSServer.cs" />
-    <Compile Include="DNSSession.cs" />
+    <Compile Include="DNSEntry.cs" />
     <Compile Include="DNSUtility.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceHost.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -34,25 +34,26 @@ namespace LanDNS
     //Third step of 3 way handshake with DNS Server.
     internal class MessageACK : Message
     {
-        public uint ServerSequence { get; private set; }
+        public uint SequenceSum { get; private set; }
         public string ServiceName { get; private set; }
-        public IPEndPoint ServiceIP { get; private set; }
+        public IPEndPoint ServiceEP { get; private set; }
 
-        public MessageACK(uint serverSequence, string serviceName) : base(MessageType.ACK)
+        public MessageACK(uint serverSequence, string serviceName, IPEndPoint serviceEP) : base(MessageType.ACK)
         {
-            this.ServerSequence = serverSequence;
+            this.SequenceSum = serverSequence;
             this.ServiceName = serviceName;
+            this.ServiceEP = serviceEP;
         }
     }
 
     //Second step of 3 way handshake with DNS Server.
     internal class MessageSYNACK : Message
     {
-        public uint SequenceSum { get; private set; }
+        public uint ServerSequence { get; private set; }
         
         public MessageSYNACK(uint sequenceSum) : base(MessageType.SYNACK)
         {
-            this.SequenceSum = sequenceSum;
+            this.ServerSequence = sequenceSum;
             
         }
     }
@@ -60,12 +61,10 @@ namespace LanDNS
     //Accept client's request to host IP for service.
     internal class MessageAccept : Message
     {
-        public uint SequenceSum { get; private set; }
-        public DNSSession Session { get; private set; }
+        public DNSEntry Session { get; private set; }
         
-        public MessageAccept(uint sequenceSum, DNSSession session) : base(MessageType.Accept)
+        public MessageAccept(DNSEntry session) : base(MessageType.Accept)
         {
-            this.SequenceSum = sequenceSum;
             this.Session = session;
         }
     }
@@ -111,10 +110,12 @@ namespace LanDNS
     internal class MessageReturnRequest : Message
     {
         public IPEndPoint ServiceEndpoint { get; private set; }
+        public bool Exist { get; private set; }
 
-        public MessageReturnRequest(IPEndPoint serviceEndpoint) : base(MessageType.ReturnRequest)
+        public MessageReturnRequest(IPEndPoint serviceEndpoint, bool exist) : base(MessageType.ReturnRequest)
         {
             this.ServiceEndpoint = serviceEndpoint;
+            this.Exist = exist;
         }
     }
 
