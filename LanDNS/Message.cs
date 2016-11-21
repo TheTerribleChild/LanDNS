@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace LanDNS
 {
 
-    internal enum MessageType { SYN, ACK, SYNACK, Accept, Reject, Refresh, Request, ReturnRequest, GetDNS, ReplyDNSInfo }
+    internal enum MessageType { SYN, ACK, SYNACK, Accept, Reject, Refresh, Request, ReturnRequest, GetDNS, ReplyDNSInfo, TerminateService }
 
     internal class Message
     {
@@ -38,9 +38,9 @@ namespace LanDNS
         public string ServiceName { get; private set; }
         public IPEndPoint ServiceEP { get; private set; }
 
-        public MessageACK(uint serverSequence, string serviceName, IPEndPoint serviceEP) : base(MessageType.ACK)
+        public MessageACK(uint sequenceSum, string serviceName, IPEndPoint serviceEP) : base(MessageType.ACK)
         {
-            this.SequenceSum = serverSequence;
+            this.SequenceSum = sequenceSum;
             this.ServiceName = serviceName;
             this.ServiceEP = serviceEP;
         }
@@ -51,21 +51,20 @@ namespace LanDNS
     {
         public uint ServerSequence { get; private set; }
         
-        public MessageSYNACK(uint sequenceSum) : base(MessageType.SYNACK)
+        public MessageSYNACK(uint serverSequence) : base(MessageType.SYNACK)
         {
-            this.ServerSequence = sequenceSum;
-            
+            this.ServerSequence = serverSequence;
         }
     }
 
     //Accept client's request to host IP for service.
     internal class MessageAccept : Message
     {
-        public DNSEntry Session { get; private set; }
+        public DNSEntry Entry { get; private set; }
         
-        public MessageAccept(DNSEntry session) : base(MessageType.Accept)
+        public MessageAccept(DNSEntry entry) : base(MessageType.Accept)
         {
-            this.Session = session;
+            this.Entry = entry;
         }
     }
 
@@ -137,6 +136,18 @@ namespace LanDNS
         {
             this.DNSListenerEP = dnsListenerEP;
             this.DNSResponderEP = dnsResponderEP;
+        }
+    }
+
+    internal class MessageTerminateEntry : Message
+    {
+        public string ServiceName { get; private set; }
+        public uint SessionKey { get; private set; }
+
+        public MessageTerminateEntry(string serviceName, uint sessionKey) : base(MessageType.TerminateService)
+        {
+            this.ServiceName = serviceName;
+            this.SessionKey = sessionKey;
         }
     }
 }

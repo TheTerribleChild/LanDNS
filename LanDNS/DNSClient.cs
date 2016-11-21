@@ -20,7 +20,7 @@ namespace LanDNS
 
         public void Start()
         {
-            udpConnector.Listen = true;
+            udpConnector.PassiveListen = true;
             Message msg = new MessageSYN(10);
             udpConnector.SendMessage(Utility.SerializeUtility.SerializeToJsonString(msg), new IPEndPoint(IPAddress.Broadcast, 5053));
         }
